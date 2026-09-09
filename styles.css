@@ -460,3 +460,11 @@ td {
 
 .service-name { font-weight: 700; }
 .exec-name { font-weight: 600; font-style: normal; }
+
+.row-label {
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
