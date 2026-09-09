@@ -89,15 +89,29 @@ function normalizeServiceRows(rows) {
     return !lowered.includes('atividade') && !lowered.includes('chuva') && !lowered.includes('total') && !lowered.includes('periodo') && !lowered.includes('navegação');
   });
 
-  return serviceRows.map((row) => {
-    const meaningfulCells = row.filter((cell) => String(cell).trim() !== '');
-    const lastThree = meaningfulCells.slice(-3);
-    const name = String(row[0] || '').trim();
-    const cumulative = normalizeNumber(lastThree[0]);
-    const target = normalizeNumber(lastThree[1]);
-    const percent = parsePercent(lastThree[2]);
-    return { name, cumulative, target, percent };
-  }).filter((item) => item.name && item.target !== 0);
+  return serviceRows
+    .map((row) => {
+      const meaningfulCells = row.filter((cell) => String(cell).trim() !== '');
+      const lastThree = meaningfulCells.slice(-3);
+      let name = String(row[0] || '').trim();
+      name = name.replace(/^\uFEFF/, '').replace(/^ï»¿/, '').trim();
+      if (/Ã|Â|â|â”|ï»|Ã§/.test(name)) {
+        try { name = decodeURIComponent(escape(name)); } catch (e) { /* ignore */ }
+      }
+      const cumulative = normalizeNumber(lastThree[0]);
+      const target = normalizeNumber(lastThree[1]);
+      const percent = parsePercent(lastThree[2]);
+      return { name, cumulative, target, percent };
+    })
+    .filter((item) => {
+      if (!item || !item.name) return false;
+      const nm = item.name.replace(/^[^A-Za-z0-9]*/, '').replace(/[^A-Za-z0-9].*$/, '').trim();
+      if (nm.length < 3) return false;
+      if (/^[\d\W_]+$/.test(item.name)) return false;
+      if (/^ï»¿$/i.test(item.name)) return false;
+      if (item.target === 0) return false;
+      return true;
+    });
 }
 
 const csv = decodeCsvText(b.buffer);

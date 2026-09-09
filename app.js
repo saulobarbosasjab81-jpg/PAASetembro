@@ -325,7 +325,22 @@ function normalizeServiceRows(rows) {
     .map((row) => {
       const meaningfulCells = row.filter((cell) => String(cell).trim() !== '');
       const lastThree = meaningfulCells.slice(-3);
-      const name = String(row[0] || '').trim();
+      let name = String(row[0] || '').trim();
+
+      // Strip common BOM remnants and whitespace
+      name = name.replace(/^\uFEFF/, '').replace(/^ï»¿/, '').trim();
+
+      // Attempt to fix mojibake by reinterpreting Latin1 sequences
+      if (/Ã|Â|â|â”|ï»|Ã§/.test(name)) {
+        try {
+          // decodeURIComponent(escape(...)) is a common browser trick to fix Latin1->UTF8
+          // eslint-disable-next-line no-undef
+          name = decodeURIComponent(escape(name));
+        } catch (e) {
+          // ignore and keep original
+        }
+      }
+
       const cumulative = normalizeNumber(lastThree[0]);
       const target = normalizeNumber(lastThree[1]);
       const percent = parsePercent(lastThree[2]);
@@ -342,7 +357,17 @@ function normalizeServiceRows(rows) {
         percentage: percent,
       };
     })
-    .filter((item) => item.name && item.target !== '0' && item.target !== 0);
+    .filter((item) => {
+      if (!item) return false;
+      if (!item.name) return false;
+      // Reject names that are just BOM remnants, very short, purely numeric or punctuation
+      const nm = item.name.replace(/^[^\p{L}\p{N}]*/u, '').replace(/[^\p{L}\p{N}].*$/u, '').trim();
+      if (nm.length < 3) return false;
+      if (/^[\d\W_]+$/.test(item.name)) return false;
+      if (/^ï»¿$/i.test(item.name)) return false;
+      if (item.target === '0' || item.target === 0) return false;
+      return true;
+    });
 }
 
 function applyMetricsFromServices(serviceItems) {
