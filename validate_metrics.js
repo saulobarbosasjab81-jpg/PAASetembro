@@ -63,6 +63,26 @@ function parseGoogleCsv(csvText) {
   return rows;
 }
 
+function repairMojibake(input) {
+  if (!input || typeof input !== 'string') return input;
+  try {
+    // Try reinterpret binary/latin1 bytes as UTF-8
+    const b = Buffer.from(input, 'binary');
+    const asUtf8 = b.toString('utf8');
+    if (/[áàãâéíóúçÁÀÃÂÉÍÓÚÇ]/.test(asUtf8)) return asUtf8;
+    const asLatin1 = Buffer.from(input, 'latin1').toString('utf8');
+    if (/[áàãâéíóúçÁÀÃÂÉÍÓÚÇ]/.test(asLatin1)) return asLatin1;
+  } catch (e) {}
+  try {
+    const fixed = decodeURIComponent(escape(input));
+    if (/[áàãâéíóúçÁÀÃÂÉÍÓÚÇ]/.test(fixed)) return fixed;
+  } catch (e) {}
+  const map = {'Ã§':'ç','Ã£':'ã','Ã¡':'á','Ã©':'é','Ãª':'ê','Ãº':'ú','Ã³':'ó','Ã´':'ô','ï»¿':''};
+  let out = input;
+  Object.keys(map).forEach(k => { out = out.split(k).join(map[k]); });
+  return out;
+}
+
 function normalizeNumber(rawValue) {
   if (rawValue === undefined || rawValue === null || rawValue === '') return 0;
   const value = String(rawValue).trim();

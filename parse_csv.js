@@ -77,7 +77,7 @@ const serviceRows = rows.filter((row) => {
 });
 
 const mapped = serviceRows.slice(0, 10).map((row) => {
-  const name = String(row[0]).trim();
+  const name = repairMojibake(String(row[0]).trim());
   const lastThree = row.slice(-3);
   const cumulative = normalizeNumber(lastThree[0]);
   const target = normalizeNumber(lastThree[1]);
@@ -89,3 +89,24 @@ const mapped = serviceRows.slice(0, 10).map((row) => {
 console.log('rows_total=', rows.length);
 console.log('first_service_rows=', serviceRows.slice(0, 5).map((row) => row[0]));
 console.log(JSON.stringify(mapped, null, 2));
+
+function repairMojibake(input) {
+  if (!input || typeof input !== 'string') return input;
+  // Quick try: decode latin1-encoded bytes as UTF-8
+  try {
+    const buf = Buffer.from(input, 'binary');
+    const asUtf8 = buf.toString('utf8');
+    if (/[áàãâéíóúçÁÀÃÂÉÍÓÚÇ]/.test(asUtf8)) return asUtf8;
+    const asUtf8Latin1 = Buffer.from(input, 'latin1').toString('utf8');
+    if (/[áàãâéíóúçÁÀÃÂÉÍÓÚÇ]/.test(asUtf8Latin1)) return asUtf8Latin1;
+  } catch (e) {}
+
+  // Fallback mapping for common mojibake sequences
+  const map = {
+    'Ã§':'ç','Ã£':'ã','Ã¡':'á','Ã©':'é','Ãª':'ê','Ãº':'ú','Ã³':'ó','Ã´':'ô','ï»¿':'',
+    'â”œ':'ç','â”˜':'í','â”º':'ó','Âº':'º','Âª':'ª'
+  };
+  let out = input;
+  Object.keys(map).forEach(k => { out = out.split(k).join(map[k]); });
+  return out;
+}
