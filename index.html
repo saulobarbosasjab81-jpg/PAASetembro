@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Missão Setembro/26</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">COMARA · MISSÃO</p>
+          <h1>Dashboard de Controle - Setembro/26</h1>
+        </div>
+        <div class="header-meta">
+          <span id="last-update">Última atualização: --</span>
+          <button id="refresh-btn" class="primary-button" type="button">Atualizar dados</button>
+        </div>
+      </header>
+
+      <main class="dashboard">
+        <section class="kpis" id="kpis"></section>
+
+        <section class="panel grid-2">
+          <div class="panel-header">
+            <h2>Progresso real vs planejado</h2>
+          </div>
+          <div class="panel-header small">
+            <span class="legend"><i class="dot planned"></i> Planejado</span>
+            <span class="legend"><i class="dot actual"></i> Real</span>
+          </div>
+          <div class="curve-card">
+            <svg id="progressChart" viewBox="0 0 620 240" preserveAspectRatio="none" aria-label="Gráfico de progresso"></svg>
+          </div>
+        </section>
+
+        <section class="panel grid-2">
+          <div class="panel-header">
+            <h2>Status dos serviços</h2>
+          </div>
+          <div class="donut-wrap">
+            <svg id="statusDonut" viewBox="0 0 220 220" aria-label="Status dos serviços"></svg>
+            <div class="donut-center">
+              <strong id="statusTotal">0</strong>
+              <span>serviços</span>
+            </div>
+          </div>
+          <div id="statusLegend" class="status-legend"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Resumo executivo por serviço</h2>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Serviço</th>
+                  <th>Acum.</th>
+                  <th>Meta</th>
+                  <th>Desvio</th>
+                  <th>Situação</th>
+                </tr>
+              </thead>
+              <tbody id="serviceTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Produção diária</h2>
+          </div>
+          <div id="dailyProduction" class="daily-production"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
