@@ -414,3 +414,28 @@ td {
     grid-template-columns: 1fr;
   }
 }
+
+/* Progress bar for service rows */
+.progress-cell {
+  width: 220px;
+}
+.progress {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(177,195,219,0.08);
+  height: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue), var(--green));
+  width: 0%;
+  transition: width 600ms ease;
+}
+.progress-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 6px;
+  text-align: right;
+}
