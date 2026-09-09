@@ -1,0 +1,39 @@
+name: Update Executivo CSV
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # daily at 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      sheet_url:
+        description: 'Public CSV URL for the Executivo sheet (optional)'
+        required: false
+
+jobs:
+  update-executive:
+    runs-on: ubuntu-latest
+    env:
+      SHEET_URL: ${{ github.event.inputs.sheet_url || secrets.SHEET_CSV_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch Executivo CSV
+        run: |
+          if [ -z "$SHEET_URL" ]; then
+            echo "SHEET_URL not provided. Set repository secret SHEET_CSV_URL or pass sheet_url input.";
+            exit 1;
+          fi
+          echo "Downloading $SHEET_URL"
+          curl -fsSL "$SHEET_URL" -o dados_executivo.csv
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git add dados_executivo.csv && git diff --cached --quiet; then
+            echo "No changes to commit.";
+          else
+            git commit -m "chore: update dados_executivo.csv from Executivo sheet"
+            git push origin HEAD:main
+          fi
