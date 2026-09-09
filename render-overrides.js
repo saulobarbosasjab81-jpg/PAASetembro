@@ -27,7 +27,7 @@
 
       const er = document.createElement('tr');
       er.className = 'exec-row';
-      er.innerHTML = `<td class="service-name exec-name">↳ Executivo</td>
+      er.innerHTML = `<td class="service-name exec-name" title="${name}">↳</td>
         <td>${execAcum}</td>
         <td>${execMeta}</td>
         <td></td>
