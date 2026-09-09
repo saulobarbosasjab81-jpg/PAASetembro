@@ -23,8 +23,9 @@
       // Baseline row (first row) with service name spanning two rows
       const br = document.createElement('tr');
       br.className = 'baseline-row';
-      const baseCls = badgeClassFor(baselinePercent);
-      br.innerHTML = `<td class="service-name" rowspan="2">${name}</td>
+        const baseCls = badgeClassFor(baselinePercent);
+        const baseBadgeText = (baselinePercent || baselinePercent === 0) ? `Planejado — ${baselinePercent}%` : 'Planejado';
+        br.innerHTML = `<td class="service-name" rowspan="2">${name}</td>
         <td>${baselineAcum}</td>
         <td>${baselineMeta}</td>
         <td></td>
@@ -35,14 +36,15 @@
             <span class="progress-label">${baselinePercent ? baselinePercent + '%' : ''}</span>
           </div>
         </td>
-        <td><span class="badge ${baseCls}">Planejado</span></td>`;
+          <td><span class="badge ${baseCls}">${baseBadgeText}</span></td>`;
       serviceTableBody.appendChild(br);
 
       // Executivo row (second row)
       const er = document.createElement('tr');
       er.className = 'exec-row';
-      const execCls = badgeClassFor(execPercent);
-      er.innerHTML = `<td>${execAcum}</td>
+        const execCls = badgeClassFor(execPercent);
+        const execBadgeText = (execPercent || execPercent === 0) ? `Executado — ${execPercent}%` : 'Executado';
+        er.innerHTML = `<td>${execAcum}</td>
         <td>${execMeta}</td>
         <td></td>
         <td>
@@ -52,7 +54,7 @@
             <span class="progress-label">${execPercent}%</span>
           </div>
         </td>
-        <td><span class="badge ${execCls}">Executado</span></td>`;
+          <td><span class="badge ${execCls}">${execBadgeText}</span></td>`;
       serviceTableBody.appendChild(er);
     });
   }
