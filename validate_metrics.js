@@ -78,6 +78,10 @@ function repairMojibake(input) {
     if (/[áàãâéíóúçÁÀÃÂÉÍÓÚÇ]/.test(fixed)) return fixed;
   } catch (e) {}
   const map = {'Ã§':'ç','Ã£':'ã','Ã¡':'á','Ã©':'é','Ãª':'ê','Ãº':'ú','Ã³':'ó','Ã´':'ô','ï»¿':''};
+  map['â”œÂºâ”œÃºo'] = 'ção';
+  map['â”œÂºâ”œÃº'] = 'ção';
+  map['â”œÃrea'] = 'área';
+  map['pâ”œÃtio'] = 'pátio';
   let out = input;
   Object.keys(map).forEach(k => { out = out.split(k).join(map[k]); });
   return out;

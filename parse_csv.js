@@ -104,6 +104,7 @@ function repairMojibake(input) {
   // Fallback mapping for common mojibake sequences
   const map = {
     'Ã§':'ç','Ã£':'ã','Ã¡':'á','Ã©':'é','Ãª':'ê','Ãº':'ú','Ã³':'ó','Ã´':'ô','ï»¿':'',
+    'â”œÂºâ”œÃºo': 'ção', 'â”œÂºâ”œÃº': 'ção', 'â”œÃrea': 'área', 'pâ”œÃtio': 'pátio'
     'â”œ':'ç','â”˜':'í','â”º':'ó','Âº':'º','Âª':'ª'
   };
   let out = input;
