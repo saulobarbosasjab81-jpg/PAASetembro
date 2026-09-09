@@ -62,6 +62,26 @@ function parsePercent(rawValue) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function decodeCsvText(buffer) {
+  const bytes = new Uint8Array(buffer);
+  const utf8Text = new TextDecoder('utf-8', { fatal: false }).decode(bytes);
+
+  if (bytes.length >= 2 && bytes[0] === 0xff && bytes[1] === 0xfe) {
+    return new TextDecoder('utf-16le').decode(bytes);
+  }
+
+  const hasUtf16Pattern = Array.from(bytes.slice(0, 200)).some((byte, index) => index % 2 === 1 && byte === 0);
+  if (hasUtf16Pattern) {
+    return new TextDecoder('utf-16le').decode(bytes);
+  }
+
+  if (utf8Text.includes('├') || utf8Text.includes('�')) {
+    return new TextDecoder('utf-16le').decode(bytes);
+  }
+
+  return utf8Text;
+}
+
 function formatNumber(value) {
   if (typeof value === 'number') {
     return Number.isInteger(value) ? value.toLocaleString('pt-BR') : value.toFixed(1).replace('.', ',');
@@ -292,8 +312,9 @@ function normalizeServiceRows(rows) {
 
   return serviceRows
     .map((row) => {
+      const meaningfulCells = row.filter((cell) => String(cell).trim() !== '');
+      const lastThree = meaningfulCells.slice(-3);
       const name = String(row[0] || '').trim();
-      const lastThree = row.slice(-3);
       const cumulative = normalizeNumber(lastThree[0]);
       const target = normalizeNumber(lastThree[1]);
       const percent = parsePercent(lastThree[2]);
@@ -310,7 +331,7 @@ function normalizeServiceRows(rows) {
         percentage: percent,
       };
     })
-    .filter((item) => item.name && item.target !== '0');
+    .filter((item) => item.name && item.target !== '0' && item.target !== 0);
 }
 
 function applyMetricsFromServices(serviceItems) {
@@ -320,6 +341,7 @@ function applyMetricsFromServices(serviceItems) {
 
   const concluido = serviceItems.filter((item) => item.percentage >= 100).length;
   const adiantado = serviceItems.filter((item) => item.percentage > 100).length;
+  const risco = serviceItems.filter((item) => item.percentage >= 90 && item.percentage < 100).length;
   const atrasado = serviceItems.filter((item) => item.percentage < 90).length;
 
   state.summary = [
@@ -333,7 +355,7 @@ function applyMetricsFromServices(serviceItems) {
   state.status = [
     { name: 'Concluído', value: concluido, color: '#2dd4bf' },
     { name: 'Adiantado', value: adiantado, color: '#60a5fa' },
-    { name: 'Risco', value: 0, color: '#fbbf24' },
+    { name: 'Risco', value: risco, color: '#fbbf24' },
     { name: 'Atrasado', value: atrasado, color: '#f87171' },
   ];
 
@@ -356,7 +378,8 @@ async function loadData() {
   try {
     const response = await fetch(sheetCsv, { cache: 'no-store' });
     if (!response.ok) throw new Error('Erro ao carregar planilha');
-    const csv = await response.text();
+
+    const csv = decodeCsvText(await response.arrayBuffer());
     const rows = parseGoogleCsv(csv);
 
     if (!rows.length) throw new Error('Planilha vazia');
