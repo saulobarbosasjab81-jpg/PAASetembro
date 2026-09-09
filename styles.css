@@ -45,23 +45,23 @@ body {
 .brand-block {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .eyebrow {
   margin: 0;
   color: var(--green);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
 h1 {
   margin: 0;
-  font-size: clamp(1.4rem, 1.6vw, 2.1rem);
+  font-size: clamp(1.5rem, 1.8vw, 2.2rem);
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -130,7 +130,8 @@ h1 {
 
 .kpi-card {
   padding: 16px 16px 14px;
-  min-height: 110px;
+  min-height: 116px;
+  border-left: 3px solid rgba(96, 165, 250, 0.7);
 }
 
 .kpi-label {
@@ -171,6 +172,7 @@ h1 {
   grid-column: span 6;
   padding: 16px 18px 18px;
   border-radius: 16px;
+  border: 1px solid rgba(177, 195, 219, 0.2);
 }
 
 .panel:nth-child(3),
@@ -309,8 +311,8 @@ th, td {
 
 th {
   color: var(--muted);
-  font-size: 0.8rem;
-  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
