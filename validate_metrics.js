@@ -87,6 +87,20 @@ function repairMojibake(input) {
   return out;
 }
 
+// Load manual name map if present (normalized-key -> display name)
+const NAME_MAP_PATH = 'name_map.json';
+let NAME_MAP = {};
+try {
+  if (fs.existsSync(NAME_MAP_PATH)) NAME_MAP = JSON.parse(fs.readFileSync(NAME_MAP_PATH, 'utf8')) || {};
+} catch (e) {
+  NAME_MAP = {};
+}
+
+function normalizeKeyLocal(name) {
+  if (!name) return '';
+  return String(name).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9 ]+/g, '').trim().toLowerCase();
+}
+
 function normalizeNumber(rawValue) {
   if (rawValue === undefined || rawValue === null || rawValue === '') return 0;
   const value = String(rawValue).trim();
@@ -122,6 +136,12 @@ function normalizeServiceRows(rows) {
       if (/Ã|Â|â|â”|ï»|Ã§/.test(name)) {
         try { name = decodeURIComponent(escape(name)); } catch (e) { /* ignore */ }
       }
+      // apply manual mapping if available
+      try {
+        const k = normalizeKeyLocal(name);
+        if (NAME_MAP && NAME_MAP[k]) name = NAME_MAP[k];
+      } catch (e) {}
+
       const cumulative = normalizeNumber(lastThree[0]);
       const target = normalizeNumber(lastThree[1]);
       const percent = parsePercent(lastThree[2]);
