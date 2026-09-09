@@ -1,4 +1,13 @@
 (function(){
+  function badgeClassFor(p) {
+    if (p === null || p === undefined || p === '') return 'info';
+    const n = Number(p);
+    if (isNaN(n)) return 'info';
+    if (n >= 100) return 'ok';
+    if (n >= 90) return 'warn';
+    return 'danger';
+  }
+
   function renderTable() {
     if (typeof serviceTableBody === 'undefined') return;
     serviceTableBody.innerHTML = '';
@@ -14,6 +23,7 @@
       // Baseline row (first row) with service name spanning two rows
       const br = document.createElement('tr');
       br.className = 'baseline-row';
+      const baseCls = badgeClassFor(baselinePercent);
       br.innerHTML = `<td class="service-name" rowspan="2">${name}</td>
         <td>${baselineAcum}</td>
         <td>${baselineMeta}</td>
@@ -25,12 +35,13 @@
             <span class="progress-label">${baselinePercent ? baselinePercent + '%' : ''}</span>
           </div>
         </td>
-        <td></td>`;
+        <td><span class="badge ${baseCls}">Planejado</span></td>`;
       serviceTableBody.appendChild(br);
 
       // Executivo row (second row)
       const er = document.createElement('tr');
       er.className = 'exec-row';
+      const execCls = badgeClassFor(execPercent);
       er.innerHTML = `<td>${execAcum}</td>
         <td>${execMeta}</td>
         <td></td>
@@ -41,7 +52,7 @@
             <span class="progress-label">${execPercent}%</span>
           </div>
         </td>
-        <td>${s.status ?? ''}</td>`;
+        <td><span class="badge ${execCls}">Executado</span></td>`;
       serviceTableBody.appendChild(er);
     });
   }
