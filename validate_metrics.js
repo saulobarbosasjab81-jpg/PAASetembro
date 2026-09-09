@@ -133,10 +133,8 @@ function normalizeServiceRows(rows) {
       const lastThree = meaningfulCells.slice(-3);
       let name = String(row[0] || '').trim();
       name = name.replace(/^\uFEFF/, '').replace(/^ï»¿/, '').trim();
-      if (/Ã|Â|â|â”|ï»|Ã§/.test(name)) {
-        try { name = decodeURIComponent(escape(name)); } catch (e) { /* ignore */ }
-      }
-      // apply manual mapping if available
+      // attempt robust repair of mojibake and then apply manual mapping
+      try { name = repairMojibake(name); } catch (e) {}
       try {
         const k = normalizeKeyLocal(name);
         if (NAME_MAP && NAME_MAP[k]) name = NAME_MAP[k];

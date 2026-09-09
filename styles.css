@@ -439,3 +439,24 @@ td {
   margin-top: 6px;
   text-align: right;
 }
+
+/* Baseline vs Executivo row styles */
+.baseline-row td {
+  color: rgba(255,255,255,0.78);
+  opacity: 0.85;
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+}
+.baseline-row .progress {
+  height: 10px;
+  border-radius: 6px;
+}
+.baseline-row .progress-fill {
+  background: linear-gradient(90deg, rgba(167,139,250,0.7), rgba(96,165,250,0.7));
+  opacity: 0.6;
+}
+.exec-row td { }
+.exec-row .exec-name { color: var(--muted); font-size: 0.9rem; padding-left: 8px; }
+.exec-row .progress-fill { box-shadow: none; }
+
+.service-name { font-weight: 700; }
+.exec-name { font-weight: 600; font-style: normal; }
