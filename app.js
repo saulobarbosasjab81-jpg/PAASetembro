@@ -64,19 +64,30 @@ function parsePercent(rawValue) {
 
 function decodeCsvText(buffer) {
   const bytes = new Uint8Array(buffer);
-  const utf8Text = new TextDecoder('utf-8', { fatal: false }).decode(bytes);
 
+  // BOM for UTF-16 LE
   if (bytes.length >= 2 && bytes[0] === 0xff && bytes[1] === 0xfe) {
     return new TextDecoder('utf-16le').decode(bytes);
   }
 
+  // Try UTF-8 first
+  const utf8Text = new TextDecoder('utf-8', { fatal: false }).decode(bytes);
+
+  // Heuristic: many zero-bytes in odd positions => likely UTF-16LE
   const hasUtf16Pattern = Array.from(bytes.slice(0, 200)).some((byte, index) => index % 2 === 1 && byte === 0);
   if (hasUtf16Pattern) {
     return new TextDecoder('utf-16le').decode(bytes);
   }
 
-  if (utf8Text.includes('├') || utf8Text.includes('�')) {
-    return new TextDecoder('utf-16le').decode(bytes);
+  // Heuristic: mojibake sequences often appear when CP1252/Latin1 text is interpreted as UTF-8
+  const suspectMojibake = /├|┬|�|Ã|Â/.test(utf8Text);
+  if (suspectMojibake) {
+    try {
+      return new TextDecoder('windows-1252').decode(bytes);
+    } catch (e) {
+      // Fallback: interpret as ISO-8859-1 by mapping bytes one-to-one to codepoints
+      return String.fromCharCode.apply(null, Array.from(bytes));
+    }
   }
 
   return utf8Text;
